@@ -1,10 +1,9 @@
-import Chat from './chat';
+import Dashboard from './dashboard';
 import Server from './server';
 
 console.log('app started');
 
-const ws = new WebSocket('wss://ahj-ws-chat-server.herokuapp.com/ws');
 const server = new Server();
-const conteiner = new Chat(server, ws);
+const dash = new Dashboard(server);
 
-conteiner.events();
+dash.events();

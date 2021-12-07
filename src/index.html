@@ -8,24 +8,28 @@
 </head>
 <body>
   <div id="container">
-    <div class="nickname">
-      <h4 class="title-nickname">Выберите псевдоним</h4>
-      <input type="text" class="input-nickname">
-      <button action="button" class="btn-nickname">Продолжить</button>
-    </div>
-
-    <div class="chat none">
-      <div class="nicknames-in-chat"></div>
-      <div class="chat-room">
-        <div class="chat-message"></div>
-        <textarea type="text" class="input-chat-message"></textarea>
+    <div class="instances">
+      <h4 class="instances-title">Your micro instances:</h4>
+      <div data-id="" class="inst-here none">
+        <span class="inst-id">iiiiiiiiiiiiiiiiiiiiiii</span>
+        <div class="status">
+          <div class="status-title">Status:</div>
+          <div class="status-ind stop"></div>
+          <div class="status-description"></div>
+        </div>
+        <div class="action">
+          <div class="action-title">Actions:</div>
+          <div class="action-play-stop play"></div>
+          <div class="action-cancel"></div>
+        </div>
       </div>
-      <span class="close-chat"></span>
+      <div class="new-inst">Create new instance</div>
     </div>
-
-    <div class="used-nickname none">
-      <h4 class="title-used-nickname">Hикнейм занят, необходимо выбрать другой.</h4>
-      <button class="btn-used-nickname">Закрыть</button>
+    <div class="worklog">
+      <h4 class="worklog-title">Worklog:</h4>
+      <div class="worklog-logging">
+        
+      </div>
     </div>
   </div>
 </body>

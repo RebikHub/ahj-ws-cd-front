@@ -2,3 +2,137 @@
     padding: 0px;
     margin: 0px;
 }
+
+body {
+    display: flex;
+}
+
+#container {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+.instances {
+    width: 300px;
+    display: flex;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-sizing: border-box;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.instances-title {
+
+}
+
+.inst-here {
+    display: flex;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-sizing: border-box;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.inst-id {
+
+}
+
+.status {
+    display: flex;
+}
+
+.status-title {
+
+}
+
+.status-ind {
+    width: 12px;
+    height: 12px;
+    margin: 0 5px;
+    border-radius: 16px;
+    align-self: center;
+}
+
+.run {
+    background-color: green;
+}
+
+.stop {
+    background-color: black;
+}
+
+.status-description {
+
+}
+
+.action {
+    display: flex;
+}
+
+.action-title {
+
+}
+
+.play {
+    background-image: url(../img/play.png);
+    background-size: contain;
+}
+
+.stopped {
+    background-image: url(../img/pause.png);
+    background-size: contain;
+}
+
+.action-play-stop {
+    width: 16px;
+    height: 16px;
+    margin: 0 5px;
+}
+
+.action-cancel {
+    width: 16px;
+    height: 16px;
+    background-image: url(../img/cancel.png);
+    background-size: contain;
+}
+
+.new-inst {
+    margin-right: auto;
+    margin-left: auto;
+    text-decoration-line: underline;
+}
+
+.new-inst:hover {
+    cursor: pointer;
+}
+
+.worklog {
+    width: 300px;
+    display: flex;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-sizing: border-box;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.log {
+    display: flex;
+    flex-direction: column;
+}
+
+.worklog-title {
+
+}
+
+.worklog-logging {
+
+}
+
+.none {
+    display: none;
+}

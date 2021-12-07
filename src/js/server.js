@@ -1,24 +1,24 @@
 export default class Server {
   constructor() {
-    this.url = 'https://ahj-ws-chat-server.herokuapp.com/users';
+    this.url = 'http://localhost:3333/instances';
   }
 
-  async add(nickname) {
+  async commandForInst(command) {
     const response = await fetch(this.url, {
-      body: nickname,
+      body: command,
       method: 'POST',
     });
     const result = await response.text();
     return result;
   }
 
-  async load() {
+  async loadInst() {
     const response = await fetch(this.url);
     const result = await response.json();
     return result;
   }
 
-  async remove(id) {
+  async removeInst(id) {
     const response = await fetch(`${this.url}/${id}`, {
       method: 'DELETE',
     });
