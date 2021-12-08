@@ -3,12 +3,13 @@ export default class Server {
     this.url = 'http://localhost:3333/instances';
   }
 
-  async commandForInst(command) {
+  async create(command) {
     const response = await fetch(this.url, {
-      body: command,
       method: 'POST',
+      body: command,
     });
     const result = await response.text();
+    console.log(result);
     return result;
   }
 
@@ -18,9 +19,10 @@ export default class Server {
     return result;
   }
 
-  async removeInst(id) {
+  async commandInst(command, id) {
     const response = await fetch(`${this.url}/${id}`, {
-      method: 'DELETE',
+      method: 'POST',
+      body: command,
     });
     const result = await response.text();
     return result;

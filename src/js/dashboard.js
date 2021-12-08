@@ -12,7 +12,25 @@ export default class Dashboard {
   events() {
     this.renderInstances();
     this.clickOnCreate();
-    // this.server.commandForInst('start');
+  }
+
+  static eventSource(command) {
+    const sse = new EventSource(`http://localhost:3333/${command}`);
+    sse.addEventListener('comment', (evt) => {
+      console.log(evt.data);
+      // sse.close();
+    });
+
+    sse.addEventListener('open', (evt) => {
+      console.log(evt.type);
+      console.log('connected');
+    });
+
+    sse.addEventListener('error', (evt) => {
+      console.log(evt);
+      console.log('error');
+      // sse.close();
+    });
   }
 
   async renderInstances() {
@@ -22,6 +40,15 @@ export default class Dashboard {
       div.dataset.id = inst.id;
       div.classList.remove('none');
       div.children[0].textContent = inst.id;
+      if (inst.state === 'stopped') {
+        div.querySelector('.status-ind').classList.add('stop');
+        div.querySelector('.action-play-stop').classList.add('play');
+        div.querySelector('.status-description').textContent = 'Stopped';
+      } else {
+        div.querySelector('.status-ind').classList.add('run');
+        div.querySelector('.action-play-stop').classList.add('stopped');
+        div.querySelector('.status-description').textContent = 'Running';
+      }
       this.instances.insertBefore(div, this.newInst);
       const divLog = document.createElement('div');
       const spanDate = document.createElement('span');
@@ -39,8 +66,19 @@ export default class Dashboard {
   }
 
   async createInst() {
-    const resp = await this.server.commandForInst('create');
-    console.log(resp);
+    Dashboard.eventSource('create');
+    // this.server.create('create');
+    // this.server.instStatus('create');
+  }
+
+  async startInst() {
+    Dashboard.eventSource('start');
+    this.server.commandInst('start');
+  }
+
+  async stopInst() {
+    Dashboard.eventSource('stop');
+    this.server.commandInst('stop');
   }
 
   clickOnCreate() {
