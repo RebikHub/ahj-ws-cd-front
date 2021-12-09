@@ -5,85 +5,146 @@ export default class Dashboard {
     this.instHere = document.querySelector('.inst-here');
     this.newInst = document.querySelector('.new-inst');
     this.worklog = document.querySelector('.worklog-logging');
+    this.startStop = document.querySelectorAll('.action-play-stop');
     this.currentInst = null;
-    // Server is being created...
   }
 
   events() {
-    this.renderInstances();
+    this.getServersRenderDashboard();
     this.clickOnCreate();
+    this.clickOnStart();
+    this.clickOnStop();
+    this.clickOnDelete();
   }
 
-  static eventSource(command) {
+  eventSource(command) {
     const sse = new EventSource(`http://localhost:3333/${command}`);
-    sse.addEventListener('comment', (evt) => {
-      console.log(evt.data);
-      // sse.close();
+    sse.addEventListener('comment', (ev) => {
+      const data = JSON.parse(ev.data);
+      if (data.status === 'ok') {
+        this.addLog(data.id, data.info);
+      }
+
+      if (data.INFO === 'Server create') {
+        this.addLog(data.id, data.INFO);
+        this.addInstance(data);
+      } else if (data.INFO === 'Server delete') {
+        const servers = document.querySelectorAll('.inst-here');
+        for (const iter of servers) {
+          if (iter.dataset.id === data.id) {
+            iter.remove();
+          }
+        }
+        this.addLog(data.id, data.INFO);
+      } else if (data.INFO === 'Server stop') {
+        const servers = document.querySelectorAll('.inst-here');
+        for (const iter of servers) {
+          if (iter.dataset.id === data.id) {
+            iter.querySelector('.status-ind').classList.remove('run');
+            iter.querySelector('.status-ind').classList.add('stop');
+            iter.querySelector('.action-play-stop').classList.remove('stopped');
+            iter.querySelector('.action-play-stop').classList.add('play');
+            iter.querySelector('.status-description').textContent = 'Stopped';
+          }
+        }
+        this.addLog(data.id, data.INFO);
+      } else if (data.INFO === 'Server start') {
+        const servers = document.querySelectorAll('.inst-here');
+        for (const iter of servers) {
+          if (iter.dataset.id === data.id) {
+            iter.querySelector('.status-ind').classList.remove('stop');
+            iter.querySelector('.status-ind').classList.add('run');
+            iter.querySelector('.action-play-stop').classList.remove('play');
+            iter.querySelector('.action-play-stop').classList.add('stopped');
+            iter.querySelector('.status-description').textContent = 'Running';
+          }
+        }
+        this.addLog(data.id, data.INFO);
+      }
     });
 
-    sse.addEventListener('open', (evt) => {
-      console.log(evt.type);
+    sse.addEventListener('open', () => {
       console.log('connected');
     });
 
-    sse.addEventListener('error', (evt) => {
-      console.log(evt);
+    sse.addEventListener('error', () => {
       console.log('error');
-      // sse.close();
     });
   }
 
-  async renderInstances() {
+  async getServersRenderDashboard() {
     this.currentInst = await this.server.loadInst();
     for (const inst of this.currentInst) {
-      const div = this.instHere.cloneNode(true);
-      div.dataset.id = inst.id;
-      div.classList.remove('none');
-      div.children[0].textContent = inst.id;
-      if (inst.state === 'stopped') {
-        div.querySelector('.status-ind').classList.add('stop');
-        div.querySelector('.action-play-stop').classList.add('play');
-        div.querySelector('.status-description').textContent = 'Stopped';
-      } else {
-        div.querySelector('.status-ind').classList.add('run');
-        div.querySelector('.action-play-stop').classList.add('stopped');
-        div.querySelector('.status-description').textContent = 'Running';
-      }
-      this.instances.insertBefore(div, this.newInst);
-      const divLog = document.createElement('div');
-      const spanDate = document.createElement('span');
-      const spanServer = document.createElement('span');
-      const spanInfo = document.createElement('span');
-      spanDate.textContent = Dashboard.date();
-      spanServer.textContent = `Server: ${inst.id}`;
-      spanInfo.textContent = 'INFO: Recieved: "Load instance"';
-      divLog.appendChild(spanDate);
-      divLog.appendChild(spanServer);
-      divLog.appendChild(spanInfo);
-      divLog.classList.add('log');
-      this.worklog.appendChild(divLog);
+      this.addInstance(inst);
+      this.addLog(inst.id);
     }
   }
 
-  async createInst() {
-    Dashboard.eventSource('create');
-    // this.server.create('create');
-    // this.server.instStatus('create');
+  addInstance(data) {
+    const div = this.instHere.cloneNode(true);
+    div.dataset.id = data.id;
+    div.classList.remove('none');
+    div.children[0].textContent = data.id;
+    if (data.state === 'stopped') {
+      div.querySelector('.status-ind').classList.add('stop');
+      div.querySelector('.action-play-stop').classList.add('play');
+      div.querySelector('.status-description').textContent = 'Stopped';
+    } else {
+      div.querySelector('.status-ind').classList.add('run');
+      div.querySelector('.action-play-stop').classList.add('stopped');
+      div.querySelector('.status-description').textContent = 'Running';
+    }
+    this.instances.insertBefore(div, this.newInst);
   }
 
-  async startInst() {
-    Dashboard.eventSource('start');
-    this.server.commandInst('start');
-  }
-
-  async stopInst() {
-    Dashboard.eventSource('stop');
-    this.server.commandInst('stop');
+  addLog(id, info = 'Recieved: "Load instance"') {
+    const divLog = document.createElement('div');
+    const spanDate = document.createElement('span');
+    const spanServer = document.createElement('span');
+    const spanInfo = document.createElement('span');
+    spanDate.textContent = Dashboard.date();
+    spanServer.textContent = `Server: ${id}`;
+    spanInfo.textContent = `INFO: ${info}`;
+    divLog.appendChild(spanDate);
+    divLog.appendChild(spanServer);
+    divLog.appendChild(spanInfo);
+    divLog.classList.add('log');
+    this.worklog.appendChild(divLog);
   }
 
   clickOnCreate() {
     this.newInst.addEventListener('click', () => {
-      this.createInst();
+      this.eventSource('create');
+    });
+  }
+
+  clickOnStart() {
+    this.instances.addEventListener('click', (ev) => {
+      const div = ev.target;
+      if (div.classList.contains('play')) {
+        const { id } = div.closest('.inst-here').dataset;
+        this.eventSource(`start/?id=${id}`);
+      }
+    });
+  }
+
+  clickOnStop() {
+    this.instances.addEventListener('click', (ev) => {
+      const div = ev.target;
+      if (div.classList.contains('stopped')) {
+        const { id } = div.closest('.inst-here').dataset;
+        this.eventSource(`stop/?id=${id}`);
+      }
+    });
+  }
+
+  clickOnDelete() {
+    this.instances.addEventListener('click', (ev) => {
+      const div = ev.target;
+      if (div.classList.contains('action-cancel')) {
+        const { id } = div.closest('.inst-here').dataset;
+        this.eventSource(`delete/?id=${id}`);
+      }
     });
   }
 
