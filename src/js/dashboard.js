@@ -18,7 +18,7 @@ export default class Dashboard {
   }
 
   eventSource(command) {
-    const sse = new EventSource(`http://localhost:3333/${command}`);
+    const sse = new EventSource(`https://ahj-ws-dashboard.herokuapp.com/${command}`);
     sse.addEventListener('comment', (ev) => {
       const data = JSON.parse(ev.data);
       if (data.status === 'ok') {
